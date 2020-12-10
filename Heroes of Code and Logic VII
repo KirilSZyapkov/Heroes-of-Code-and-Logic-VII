@@ -1,0 +1,78 @@
+function heroesOfCodeAndLogicVII(input) {
+    let numHeroes = input.shift();
+    let heroList = {};
+    for (let a = 0; a < numHeroes; a++) {
+        let [name, hp, mp] = input.shift().split(` `);
+        hp = Number(hp);
+        mp = Number(mp);
+        if (!heroList.hasOwnProperty(name)) {
+            heroList[name] = {
+                HP: hp,
+                MP: mp,
+            };
+        }
+    }
+    let action = {
+        CastSpell(heroName, mp, spellName) {
+            mp = Number(mp)
+            if (heroList[heroName].MP >= mp) {
+                heroList[heroName].MP -= mp;
+                console.log(`${heroName} has successfully cast ${spellName} and now has ${heroList[heroName].MP} MP!`);
+            } else {
+                console.log(`${heroName} does not have enough MP to cast ${spellName}!`);
+            }
+        },
+        TakeDamage(heroName, damage, attacker) {
+            damage = Number(damage);
+            heroList[heroName].HP -= damage;
+            if (heroList[heroName].HP <= 0) {
+                console.log(`${heroName} has been killed by ${attacker}!`);
+                delete heroList[heroName];
+            } else {
+                console.log(`${heroName} was hit for ${damage} HP by ${attacker} and now has ${heroList[heroName].HP} HP left!`);
+            }
+        },
+        Recharge(heroName, amountMp) {
+            amountMp = Number(amountMp);
+            let curMp = heroList[heroName].MP;
+            heroList[heroName].MP += amountMp;
+            if (heroList[heroName].MP > 200) {
+                curMp = 200 - curMp;
+                console.log(`${heroName} recharged for ${curMp} MP!`);
+                heroList[heroName].MP = 200;
+            } else {
+                console.log(`${heroName} recharged for ${amountMp} MP!`);
+            }
+        },
+        Heal(heroName, amountHp) {
+            amountHp = Number(amountHp);
+            let curHp = heroList[heroName].HP;
+            heroList[heroName].HP += amountHp;
+            if (heroList[heroName].HP > 100) {
+                curHp = 100 - curHp;
+                console.log(`${heroName} healed for ${curHp} HP!`);
+                heroList[heroName].HP = 100;
+            } else {
+                console.log(`${heroName} healed for ${amountHp} HP!`);
+            }
+        }
+    };
+
+    let line;
+    while ((line = input.shift()) !== "End") {
+        let [comand, ...param] = line.split(` - `);
+        action[comand](...param);
+    }
+    let sorted = Object.entries(heroList);
+    sorted.sort((a,b)=>{
+        let [nameA, healA] = a;
+        let [nameB, healB]=b;
+        return healB.HP - healA.HP || nameA.localeCompare(nameB);
+    });
+    sorted.forEach(element=>{
+        let [heroName, stat] = element;
+        console.log(`${heroName}`);
+        console.log(`   HP: ${stat.HP}`);
+        console.log(`   MP: ${stat.MP}`);
+    });
+}
